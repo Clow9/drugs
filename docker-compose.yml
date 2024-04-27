@@ -2,16 +2,16 @@ version: '3.9'
 
 services:
 
-  paintings_service:
+  pharmacy_service:
     restart: on-failure
-    container_name: paintings_service
-    build: paintings_service/
+    container_name: pharmacy_service
+    build: pharmacy_service/
     ports:
       - "8000:80"
 
-  museum_service:
+  pharmacy_api_service:
     restart: on-failure
-    container_name: museum_service
-    build: museum_service/
+    container_name: pharmacy_api_service
+    build: pharmacy_api_service/
     ports:
       - "8001:80"

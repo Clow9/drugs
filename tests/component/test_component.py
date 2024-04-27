@@ -1,50 +1,58 @@
 import requests
+import pytest
+
 
 base_url = 'http://localhost:8000'
-add_painting_url = f'{base_url}/add_painting'
-get_paintings_url = f'{base_url}/get_paintings'
-get_painting_by_id_url = f'{base_url}/get_painting_by_id'
-update_painting_url = f'{base_url}/update_painting'
-delete_painting_url = f'{base_url}/delete_painting'
+add_drug_url = f'{base_url}/add_drug'
+get_drugs_url = f'{base_url}/get_drugs'
+get_drug_by_id_url = f'{base_url}/get_drug_by_id'
+update_drug_url = f'{base_url}/update_drug'
+delete_drug_url = f'{base_url}/delete_drug'
 
-new_painting = {
-    "id" : 99,
-    "title": "Starry Night",
-    "artist": "Vincent van Gogh",
-    "year": 1889,
-    "description": "A depiction of the view from the east-facing window of his asylum room at Saint-Rémy-de-Provence."
+new_drug = {
+    "name": "Aspirin",
+    "manufacturer": "Bayer",
+    "expiration_date": "2025-12-31T00:00:00",
+    "description": "Used to reduce pain, fever, or inflammation."
 }
 
 
-def test_add_painting():
-    res = requests.post(add_painting_url, json=new_painting)
-    assert res.status_code == 200
+@pytest.fixture(scope="function")
+def create_drug():
+    response = requests.post(add_drug_url, json=new_drug)
+    drug_id = response.json()['id']
+    yield drug_id
+    requests.delete(f"{delete_drug_url}?drug_id={drug_id}")
 
+def test_add_drug():
+    response = requests.post(add_drug_url, json=new_drug)
+    assert response.status_code == 200
+    assert response.json()['name'] == "Aspirin"
 
-def test_get_paintings():
-    res = requests.get(get_paintings_url).json()
-    assert any(p['title'] == "Starry Night" for p in res)
+def test_get_drugs():
+    response = requests.get(get_drugs_url)
+    assert response.status_code == 200
+    drugs = response.json()
+    assert any(drug['name'] == "Aspirin" for drug in drugs)
 
+def test_get_drug_by_id(create_drug):
+    drug_id = create_drug
+    response = requests.get(f"{get_drug_by_id_url}?drug_id={drug_id}")
+    assert response.status_code == 200
+    assert response.json()['id'] == drug_id
 
-def test_get_painting_by_id():
-    res = requests.get(f"{get_painting_by_id_url}?painting_id=99").json()
-    assert res['title'] == "Starry Night"
+def test_update_drug(create_drug):
+    drug_id = create_drug
+    updated_data = {"description": "Updated description for Aspirin"}
+    response = requests.put(f"{update_drug_url}?drug_id={drug_id}", json=updated_data)
+    assert response.status_code == 200
+    assert response.json()['description'] == "Updated description for Aspirin"
 
+def test_delete_drug(create_drug):
+    drug_id = create_drug
+    response = requests.delete(f"{delete_drug_url}?drug_id={drug_id}")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Drug deleted"}
 
-def test_update_painting():
-    updated_painting = {
-        "id" : 99,
-        "title": "Starry Night",
-        "artist": "Vincent van Gogh",
-        "year": 1889,
-        "description": "Updated description of the Starry Night"
-    }
-    res = requests.put(f"{update_painting_url}?painting_id=99", json=updated_painting)
-    updated_data = res.json()
-    assert res.status_code == 200
-    assert updated_data['description'] == "Updated description of the Starry Night"
-
-
-def test_delete_painting():
-    res = requests.delete(f"{delete_painting_url}?painting_id=99").json()
-    assert res == {"message": "Painting deleted"}
+    response = requests.get(f"{get_drug_by_id_url}?drug_id={drug_id}")
+    assert response.status_code == 404

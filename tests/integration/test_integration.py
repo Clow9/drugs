@@ -7,12 +7,11 @@ import sys
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 sys.path.append(str(BASE_DIR))
-sys.path.append(str(BASE_DIR / 'paintings_service/app'))
-sys.path.append(str(BASE_DIR / 'museum_service/app'))
+sys.path.append(str(BASE_DIR / 'pharmacy_service/app'))
+sys.path.append(str(BASE_DIR / 'pharmacy_api_service/app'))
 
-from paintings_service.app.main import service_alive as paintings_status
-from museum_service.app.main import service_alive as museum_status
-
+from pharmacy_service.app.main import service_alive as pharmacy_status
+from pharmacy_api_service.app.main import service_alive as pharmacy_api_status
 
 @pytest.mark.asyncio
 async def test_database_connection():
@@ -23,14 +22,12 @@ async def test_database_connection():
     except Exception as e:
         assert False, f"Не удалось подключиться к базе данных: {e}"
 
-
 @pytest.mark.asyncio
-async def test_paintings_service_connection():
-    r = await paintings_status()
+async def test_pharmacy_service_connection():
+    r = await pharmacy_status()
     assert r == {'message': 'service alive'}
 
-
 @pytest.mark.asyncio
-async def test_museum_service_connection():
-    r = await museum_status()
+async def test_pharmacy_api_service_connection():
+    r = await pharmacy_api_status()
     assert r == {'message': 'service alive'}
