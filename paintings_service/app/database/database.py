@@ -12,7 +12,7 @@ Base = declarative_base()
 
 
 class PaintingDB(Base):
-    __tablename__ = 'painting_miroshnichenko'
+    __tablename__ = 'painting_eriskin'
 
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
