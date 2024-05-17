@@ -7,6 +7,7 @@ app = FastAPI()
 API_KEY = "KDQdydwA8aTXrLif8o1ublmBRKbwxa5WT9IGRZug"
 
 
+
 @app.get("/health", status_code=status.HTTP_200_OK)
 async def service_alive():
     return {'message': 'service alive'}
