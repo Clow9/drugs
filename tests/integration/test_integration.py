@@ -31,3 +31,4 @@ async def test_pharmacy_service_connection():
 async def test_pharmacy_api_service_connection():
     r = await pharmacy_api_status()
     assert r == {'message': 'service alive'}
+
